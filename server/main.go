@@ -14,6 +14,8 @@ var upgrader = websocket.Upgrader{
 }
 
 var clients = []websocket.Conn{}
+var allPlayers = []player{}
+var incrementingId uint16 = 0
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
@@ -24,7 +26,9 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, _ := upgrader.Upgrade(w, r, nil)
 
 	clients = append(clients, *conn)
-
+	// Add and init player
+	incrementingId++
+	createNewPlayer(player{incrementingId, 15, 15, "Name", 1, conn.RemoteAddr().String()}, &allPlayers)
 	for {
 		msgType, msg, err := conn.ReadMessage()
 		if err != nil {
@@ -32,22 +36,17 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Printf("%s send: %s\n", conn.RemoteAddr(), string(msg))
+		fmt.Println("Number of clients: ", len(clients))
 
-		/*for _, client := range clients {
-			if err = client.WriteMessage(msgType, msg); err != nil {
-				return
+		for _, client := range clients {
+			if client.RemoteAddr() != conn.RemoteAddr() {
+				client.WriteMessage(msgType, msg) // Populate the message to other clients
 			}
-		}*/
-		clients[0].WriteMessage(msgType, msg) // Test back message
+		}
 	}
 }
 
 func main() {
-	allPlayers := []player{}
-	createNewPlayer(player{0, 5, 5, "Newplayer", 1}, &allPlayers)
-	createNewPlayer(player{0, 10, 10, "SecondOne", 2}, &allPlayers)
-	fmt.Println(allPlayers)
-
 	http.HandleFunc("/test", hello)
 	http.HandleFunc("/", webSocketHandler)
 	log.Println("Serving at localhost:8080...")
