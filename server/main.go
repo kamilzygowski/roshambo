@@ -12,6 +12,10 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
 )
 
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Server is online"))
+}
+
 var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
@@ -27,7 +31,7 @@ func main() {
 			},
 		},
 	})
-
+	// Socket Events & Emiters
 	server.OnConnect("/socket.io/", func(s socketio.Conn) error {
 		s.SetContext("")
 		fmt.Println("Connected: ", s.ID())
@@ -35,7 +39,7 @@ func main() {
 	})
 
 	server.OnDisconnect("/socket.io/", func(s socketio.Conn, reason string) {
-		fmt.Println("closed", reason)
+		log.Println("closed", reason)
 	})
 
 	server.BroadcastToRoom("", "bcast", "render", "")
@@ -48,11 +52,11 @@ func main() {
 	//go server.Serve()
 	//defer server.Close()
 
+	http.Handle("/socket.io/", server)
 	http.HandleFunc("/", hello)
 	//http.HandleFunc("/socket.io", socketHandler)
-	http.Handle("/socket.io/", server)
 	log.Println("Serving at localhost:8000...")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8000", server))
 	/*for {
 		//fmt.Println(allPlayers)
 		//allPlayers[0].move(0)
