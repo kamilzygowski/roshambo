@@ -5,60 +5,51 @@ import (
 	"log"
 	"net/http"
 
-	socketio "github.com/googollee/go-socket.io"
-	"github.com/googollee/go-socket.io/engineio"
-	"github.com/googollee/go-socket.io/engineio/transport"
-	"github.com/googollee/go-socket.io/engineio/transport/polling"
-	"github.com/googollee/go-socket.io/engineio/transport/websocket"
+	"github.com/gorilla/websocket"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+var clients = []websocket.Conn{}
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
 }
 
-var allowOriginFunc = func(r *http.Request) bool {
-	return true
+func webSocketHandler(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true } // Very important
+	conn, _ := upgrader.Upgrade(w, r, nil)
+
+	clients = append(clients, *conn)
+
+	for {
+		msgType, msg, err := conn.ReadMessage()
+		if err != nil {
+			return
+		}
+
+		fmt.Printf("%s send: %s\n", conn.RemoteAddr(), string(msg))
+
+		/*for _, client := range clients {
+			if err = client.WriteMessage(msgType, msg); err != nil {
+				return
+			}
+		}*/
+		clients[0].WriteMessage(msgType, msg) // Test back message
+	}
 }
 
 func main() {
-	server := socketio.NewServer(&engineio.Options{
-		Transports: []transport.Transport{
-			&polling.Transport{
-				CheckOrigin: allowOriginFunc,
-			},
-			&websocket.Transport{
-				CheckOrigin: allowOriginFunc,
-			},
-		},
-	})
-	// Socket Events & Emiters
-	server.OnConnect("/socket.io/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("Connected: ", s.ID())
-		return nil
-	})
-
-	server.OnDisconnect("/socket.io/", func(s socketio.Conn, reason string) {
-		log.Println("closed", reason)
-	})
-
-	server.BroadcastToRoom("", "bcast", "render", "")
-
 	allPlayers := []player{}
 	createNewPlayer(player{0, 5, 5, "Newplayer", 1}, &allPlayers)
 	createNewPlayer(player{0, 10, 10, "SecondOne", 2}, &allPlayers)
 	fmt.Println(allPlayers)
 
-	//go server.Serve()
-	//defer server.Close()
-
-	http.Handle("/socket.io/", server)
-	http.HandleFunc("/", hello)
-	//http.HandleFunc("/socket.io", socketHandler)
-	log.Println("Serving at localhost:8000...")
-	log.Fatal(http.ListenAndServe(":8000", server))
-	/*for {
-		//fmt.Println(allPlayers)
-		//allPlayers[0].move(0)
-	}*/
+	http.HandleFunc("/test", hello)
+	http.HandleFunc("/", webSocketHandler)
+	log.Println("Serving at localhost:8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

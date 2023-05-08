@@ -4,32 +4,33 @@ import './App.css';
 import { socket } from "./socket"
 
 function App() {
-  //const [socket, setSocket] = useState<any>();
+  const [message, setMessage] = useState<string>("");
  useEffect(() => {
-   /* const sock = io("localhost:8000/socket.io", {
-      withCredentials: true,
-      //transports: ["websocket"]
-    })*/
-    //setSocket(sock)
-    console.log(socket)
-    socket.on("connect", () => {
-      console.log("Connected!")
-    })
-    socket.on("connecting", () => {
-      console.log("Trying to connect")
-    })
-    socket.on("render", () => {
-      console.log("Render")
-    })
-    return () => {
-      socket.close()
-    }
+  socket.onopen = () => {
+    console.log("Connected")
+  }
+  socket.onmessage = (e) => {
+    console.log(e.data)
+  }
    
  }, [])
+
+const handleMessage = () => {
+  if (message === ""){
+    return
+  }
+  try {
+    socket.send(message);
+  } catch (error) {
+    console.error(error)
+  }
+  
+}
  
   return (
     <div className="App">
-
+      <input type="text" onChange={(event) => setMessage(event.target.value)}></input>
+      <button onClick={handleMessage}>Send message</button>
     </div>
   );
 }
