@@ -28,10 +28,19 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	clients = append(clients, *conn)
 	// Add and init player
 	incrementingId++
-	createNewPlayer(player{incrementingId, 15, 15, "Name", 1, conn.RemoteAddr().String()}, &allPlayers)
+	newPlayer := player{incrementingId, 15, 15, "Name", 1, conn.RemoteAddr().String()}
+	createNewPlayer(newPlayer, &allPlayers)
 	for {
 		msgType, msg, err := conn.ReadMessage()
 		if err != nil {
+			// Handling error / disconnect
+			fmt.Printf("User %s has disconnected\n", conn.RemoteAddr())
+			// Removing client
+			for index, client := range clients {
+				if client.RemoteAddr() == (*conn).RemoteAddr() {
+					clients = append(clients[:index], clients[index+1:]...)
+				}
+			}
 			return
 		}
 
@@ -39,9 +48,9 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Number of clients: ", len(clients))
 
 		for _, client := range clients {
-			if client.RemoteAddr() != conn.RemoteAddr() {
-				client.WriteMessage(msgType, msg) // Populate the message to other clients
-			}
+			//if client.RemoteAddr() != conn.RemoteAddr() {
+			client.WriteMessage(msgType, msg) // Populate the message to other clients
+			//}
 		}
 	}
 }
