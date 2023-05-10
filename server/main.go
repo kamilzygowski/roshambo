@@ -21,20 +21,12 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
 }
 
-func webSocketHandler(w http.ResponseWriter, r *http.Request) {
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true } // Very important
-	conn, _ := upgrader.Upgrade(w, r, nil)
-
-	clients = append(clients, *conn)
-	// Add and init player
-	incrementingId++
-	newPlayer := player{incrementingId, 15, 15, "Name", 1, conn.RemoteAddr().String()}
-	createNewPlayer(newPlayer, &allPlayers)
+func socketReader(conn *websocket.Conn) {
 	for {
-		msgType, msg, err := conn.ReadMessage()
+		msgType, msg, err := (*conn).ReadMessage()
 		if err != nil {
 			// Handling error / disconnect
-			fmt.Printf("User %s has disconnected\n", conn.RemoteAddr())
+			fmt.Printf("User %s has disconnected\n", (*conn).RemoteAddr())
 			// Removing client
 			for index, client := range clients {
 				if client.RemoteAddr() == (*conn).RemoteAddr() {
@@ -44,15 +36,28 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Printf("%s send: %s\n", conn.RemoteAddr(), string(msg))
+		fmt.Printf("%s send: %s\n", (*conn).RemoteAddr(), string(msg))
 		fmt.Println("Number of clients: ", len(clients))
 
 		for _, client := range clients {
-			//if client.RemoteAddr() != conn.RemoteAddr() {
-			client.WriteMessage(msgType, msg) // Populate the message to other clients
-			//}
+			if msg[0] == []byte("m")[0] {
+				client.WriteMessage(msgType, msg) // Populate the message to other clients
+			}
+
 		}
 	}
+}
+
+func webSocketHandler(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true } // Very important
+	conn, _ := upgrader.Upgrade(w, r, nil)
+
+	clients = append(clients, *conn)
+	// Add and init player
+	incrementingId++
+	newPlayer := player{incrementingId, 15, 15, "Name", 1, (*conn).RemoteAddr().String()}
+	createNewPlayer(newPlayer, &allPlayers)
+	socketReader(conn)
 }
 
 func main() {

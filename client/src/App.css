@@ -8,6 +8,13 @@
 .main {
   height: 100%;
   clear: both;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.startButton{
+  height: 40px;
 }
 
 .wrapper {
