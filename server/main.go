@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -19,6 +20,16 @@ var incrementingId uint16 = 0
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
+}
+
+func getPlayerFromClient(conn net.Addr, _allPlayers *[]player) *player {
+	var resultPlayer *player
+	for _, p := range *_allPlayers {
+		if (conn).String() == p.remoteAddress {
+			resultPlayer = &p
+		}
+	}
+	return resultPlayer
 }
 
 func socketReader(conn *websocket.Conn) {
@@ -40,10 +51,32 @@ func socketReader(conn *websocket.Conn) {
 		fmt.Println("Number of clients: ", len(clients))
 
 		for _, client := range clients {
+			fmt.Println(client.RemoteAddr())
 			if msg[0] == []byte("m")[0] {
+				// Chat message
 				client.WriteMessage(msgType, msg) // Populate the message to other clients
-			}
+			} else if msg[0] == []byte("n")[0] { //&& ((*getPlayerFromClient(client.RemoteAddr(), &allPlayers)).name == client.RemoteAddr().String()) {
+				// Name
+				msgContent := msg[1:]
+				for i := range allPlayers {
+					if (allPlayers[i]).remoteAddress == (*conn).RemoteAddr().String() {
+						(allPlayers[i]).name = string(msgContent)
+						fmt.Println(allPlayers[i])
+						fmt.Println("JD")
+					}
+				}
 
+			} else if msg[0] == []byte("r")[0] {
+				// Room
+				fmt.Println(client.RemoteAddr())
+				for i := range allPlayers {
+					if (allPlayers[i]).remoteAddress == client.RemoteAddr().String() {
+						fmt.Println(allPlayers[i])
+						fmt.Println("JD2")
+					}
+					//p := getPlayerFromClient(client.RemoteAddr(), &allPlayers)
+				}
+			}
 		}
 	}
 }
@@ -55,7 +88,7 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	clients = append(clients, *conn)
 	// Add and init player
 	incrementingId++
-	newPlayer := player{incrementingId, 15, 15, "Name", 1, (*conn).RemoteAddr().String()}
+	newPlayer := player{id: incrementingId, name: "Name", remoteAddress: (*conn).RemoteAddr().String(), inGame: false}
 	createNewPlayer(newPlayer, &allPlayers)
 	socketReader(conn)
 }

@@ -6,11 +6,9 @@ import (
 
 type player struct {
 	id            uint16
-	x             int32
-	y             int32
 	name          string
-	vocation      uint8
 	remoteAddress string
+	inGame        bool
 }
 
 const (
@@ -21,14 +19,10 @@ const (
 )
 
 func createNewPlayer(_player player, allPlayers *[]player) {
-	newPlayer := player{id: _player.id, x: _player.x, y: _player.y, name: _player.generateName(), vocation: _player.vocation, remoteAddress: _player.remoteAddress}
+	newPlayer := player{id: _player.id, name: _player.generateName(), remoteAddress: _player.remoteAddress}
 	*allPlayers = append(*allPlayers, newPlayer)
 }
 
 func (p *player) generateName() string {
 	return "Player" + strconv.Itoa(int((*p).id))
-}
-
-func (p *player) move(direction uint8) {
-	(*p).x++
 }

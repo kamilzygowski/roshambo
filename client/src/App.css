@@ -13,6 +13,30 @@
   justify-content: center;
 }
 
+.acceptName{
+  margin-top: 25px;
+  width: 65px;
+  height: 30px;
+}
+
+.inputName{
+  width: 250px;
+  height: 20px;
+  border: none;
+  outline: none;
+}
+
+.setName{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: inherit;
+  background: rgba(0,0,0,0.99);
+}
+
 .startButton{
   height: 40px;
 }

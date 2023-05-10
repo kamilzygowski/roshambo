@@ -5,10 +5,11 @@ import dateFormat from "dateformat"
 
 function App() {
   const [connected, setConnected] = useState<boolean>(false);
+  const [name, setName] = useState<string>()
+  const [draftingName, setDraftingName] = useState<string>()
   const [chatMessages, setChatMessages] = useState<string[]>(["#### GLOBAL CHAT ####"])
   const chatInputRef = useRef<any>()
   const chatWrapperRef = useRef<any>();
-
   useEffect(() => {
     chatWrapperRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [chatMessages])
@@ -18,7 +19,7 @@ function App() {
       setConnected(true);
     }
     socket.onmessage = (e) => {
-      if (e.data[0] === 'm'){
+      if (e.data[0] === 'm') {
         const datePrefix = new Date()
         let dataAsString = e.data.toString().substring(1)
         setChatMessages(oldArray => [...oldArray, dateFormat(datePrefix, "HH:MM") + dataAsString])
@@ -33,7 +34,7 @@ function App() {
     if (chatInputRef.current.value === "") {
       return
     }
-    socket.send("m [Name]: " + chatInputRef.current.value)
+    socket.send(`m [${name}]: ` + chatInputRef.current.value)
     chatInputRef.current.value = ""
   }
 
@@ -42,14 +43,19 @@ function App() {
   }
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.code === "Enter"){
+    if (event.code === "Enter") {
       handleMessage()
     }
-  } 
+  }
+  const sendNameToSock = () => {
+    setName(draftingName)
+    socket.send("n" + draftingName)
+  }
 
   return (
     <div className="App" onKeyDown={keyDownHandler}>
       {connected ? <p className='connectionStatus'>Connected</p> : <p className='connectionStatus'>Not connected</p>}
+      {name === undefined ? <div className='setName'><input className='inputName' onChange={(elem) => setDraftingName(elem.target.value)}/><button className='acceptName' onClick={(e) => sendNameToSock()}>Accept</button></div> : null}
       <div className='main'>
         <button className='startButton' onClick={handleRoomEnter}>Start</button>
       </div>
