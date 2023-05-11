@@ -2,6 +2,8 @@ package main
 
 import (
 	"strconv"
+
+	"github.com/gorilla/websocket"
 )
 
 type player struct {
@@ -9,6 +11,13 @@ type player struct {
 	name          string
 	remoteAddress string
 	inGame        bool
+	conn          *websocket.Conn
+}
+
+type Games struct {
+	isDone  bool
+	players []string
+	names   []string
 }
 
 const (
@@ -18,8 +27,8 @@ const (
 	West  = 3
 )
 
-func createNewPlayer(_player player, allPlayers *[]player) {
-	newPlayer := player{id: _player.id, name: _player.generateName(), remoteAddress: _player.remoteAddress}
+func createNewPlayer(_player player, allPlayers *[]player, conn *websocket.Conn) {
+	newPlayer := player{id: _player.id, name: _player.generateName(), remoteAddress: _player.remoteAddress, conn: conn}
 	*allPlayers = append(*allPlayers, newPlayer)
 }
 
