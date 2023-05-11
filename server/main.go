@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -52,6 +53,16 @@ func sendRoomsToAllClients() {
 
 func socketReader(conn *websocket.Conn) {
 	for {
+		for i := range allGames {
+			if allGames[i].players[0].isReady == true && allGames[i].players[1].isReady == true {
+				fmt.Println("PATRZYMY CO MAJĄ SHEET")
+				fmt.Println(allGames[i].players[0].choice)
+				fmt.Println(allGames[i].players[1].choice)
+				allGames = append(allGames[:i], allGames[i+1:]...)
+			}
+			fmt.Println(allGames[i])
+		}
+
 		msgType, msg, err := (*conn).ReadMessage()
 		if err != nil {
 			// Handling error / disconnect
@@ -94,16 +105,34 @@ func socketReader(conn *websocket.Conn) {
 				fmt.Println(client.RemoteAddr())
 				for i := range allPlayers {
 					if (allPlayers[i]).name == string(msgContent) {
-						// IF PLAYER CLICKED ON HIS ROOM
+						// IF PLAYER DIDNT CLICK ON HIS ROOM
 						if client.RemoteAddr().String() != allPlayers[i].remoteAddress {
 							if client.RemoteAddr().String() == (*conn).RemoteAddr().String() {
-								fmt.Println(allPlayers[i])
-								fmt.Println("JD2")
-								allGames = append(allGames, Games{players: []string{client.RemoteAddr().String(), allPlayers[i].remoteAddress}, names: []string{}, isDone: false})
+								var playerFromClient *player
+								for i := range allPlayers {
+									if allPlayers[i].remoteAddress == client.RemoteAddr().String() {
+										playerFromClient = &allPlayers[i]
+									}
+								}
+								allGames = append(allGames, Games{players: []player{*playerFromClient, allPlayers[i]}, isDone: false})
 								(*allPlayers[i].conn).WriteMessage(1, []byte("g"))
 								(*conn).WriteMessage(1, []byte("g"))
 							}
 						}
+					}
+				}
+			} else if msg[0] == []byte("g")[0] {
+				msgContent := msg[1:]
+				// Player is ready
+				for i := range allPlayers {
+					if (allPlayers[i]).remoteAddress == (*conn).RemoteAddr().String() {
+						msgInt, err := strconv.Atoi(string(msgContent))
+						if err != nil {
+							fmt.Println("ERROR [Msg string to int conversion] ERROR")
+						}
+						fmt.Println("Krincz")
+						allPlayers[i].setReady(uint8(msgInt))
+						fmt.Println(allPlayers[i].choice)
 					}
 				}
 			}
@@ -119,7 +148,7 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	//(*conn).WriteMessage(1, []byte("r"+allNames))
 	// Add and init player
 	incrementingId++
-	newPlayer := player{id: incrementingId, name: "Name", remoteAddress: (*conn).RemoteAddr().String(), inGame: false, conn: conn}
+	newPlayer := player{id: incrementingId, name: "Name", remoteAddress: (*conn).RemoteAddr().String(), isReady: false, conn: conn}
 	createNewPlayer(newPlayer, &allPlayers, conn)
 	sendRoomsToAllClients()
 	socketReader(conn)

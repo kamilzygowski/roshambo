@@ -5,7 +5,7 @@
   height: 100vh;
 }
 
-.main {
+.main, .game {
   height: 100%;
   width: 100%;
   display: flex;
@@ -13,6 +13,60 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+}
+
+.game{
+  flex-direction: column;
+}
+
+.ready{
+  width: 120px;
+  height: 40px;
+  margin-bottom: 85px;
+  font-size: 20px;
+  border: none;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 5px;
+  background-color: #6ab04c;
+}
+
+.ready:hover{
+  transition: 0.2s;
+  background-color: #686de0;
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+.chosen{
+  opacity: 1;
+  box-shadow: rgba(0, 255, 128, 0.45) 0px 54px 55px, rgba(0, 255, 106, 0.22) 0px -12px 30px, rgba(0, 255, 55, 0.22) 0px 4px 16px, rgba(255, 255, 255, 0.2) 0px 12px 13px, rgba(0, 255, 0, 0.19) 0px -3px 5px;
+}
+
+.oneOfThree{
+  width: 195px;
+  height: 195px;
+  margin-inline: 25px;
+  background-color: #f7d794;
+  border: none;
+  opacity: 0.6;
+  color: rgba(0,0,0,0);
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.oneOfThree:nth-of-type(1){
+  background-image: url("../public/paper.svg");
+}
+.oneOfThree:nth-of-type(2){
+  background-image: url("../public/rock.svg");
+}
+.oneOfThree:nth-of-type(3){
+  background-image: url("../public/scissors.svg");
+}
+
+.oneOfThree:hover{
+  opacity: 1;
+  transition: 0.05s;
 }
 
 .room{

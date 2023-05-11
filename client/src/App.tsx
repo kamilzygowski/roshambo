@@ -13,6 +13,8 @@ function App() {
   const chatWrapperRef = useRef<any>();
   const [duringMatch, setDuringMatch] = useState<boolean>(false)
   const [oneOfThreeChoice, setOneOfThreeChoice] = useState<number>()
+  const [gameStatus, setGameStatus] = useState<string>("")
+  const buttonsRef = useRef<any>()
   enum OneOfThree {
     Paper,
     Stone,
@@ -37,7 +39,7 @@ function App() {
         const resultArr = dataAsString.split(charsToSplit)
         console.log(dataAsString)
         setRooms(resultArr)
-      }else if (e.data[0] === "g"){
+      } else if (e.data[0] === "g") {
         setDuringMatch(true)
       }
     }
@@ -67,27 +69,42 @@ function App() {
     setName(draftingName)
     socket.send("n" + draftingName)
   }
+  const oneOfThreeHandler = (e: any) => {
+    setOneOfThreeChoice(e.target.value)
+    const arr = [].slice.call(buttonsRef.current.children);
+    arr.forEach((element: HTMLElement) => {
+      element.classList.remove("chosen")
+      element.style.opacity = "0.6";
+    })
+    e.target.classList.add("chosen")
+    e.target.style.opacity = 1;
+  }
 
   return (
     <div className="App" onKeyDown={keyDownHandler}>
       {connected ? <p className='connectionStatus'>Connected</p> : <p className='connectionStatus'>Not connected</p>}
       {name === undefined ? <div className='setName'><input className='inputName' onChange={(elem) => setDraftingName(elem.target.value)} />
         <button className='acceptName' onClick={(e) => sendNameToSock()}>Accept</button></div> : null}
-        {duringMatch ? 
+      {duringMatch ?
         <div className='game'>
-          <input type="button" className='oneOfThree' value={OneOfThree.Paper} onClick={(e: any) => setOneOfThreeChoice(e.target.value)}/>
-          <input type="button" className='oneOfThree' value={OneOfThree.Stone} onClick={(e: any) => setOneOfThreeChoice(e.target.value)}/>
-          <input type="button" className='oneOfThree' value={OneOfThree.Scissors} onClick={(e: any) => setOneOfThreeChoice(e.target.value)}/>
+          <p>{gameStatus}</p>
+          <input className='ready' value={"READY"} type="button" onClick={() => { socket.send("g" + oneOfThreeChoice); setGameStatus("Waiting for opponent") }} />
+          <div ref={buttonsRef}>
+            <input type="button" className='oneOfThree' value={OneOfThree.Paper} onClick={oneOfThreeHandler} />
+            <input type="button" className='oneOfThree' value={OneOfThree.Stone} onClick={oneOfThreeHandler} />
+            <input type="button" className='oneOfThree' value={OneOfThree.Scissors} onClick={oneOfThreeHandler} />
           </div>
-      :
-      <div className='main'>
-      {rooms.map((element, index) => {
-        if (element === ""){
-          return null;
-        }
-        return <input className='room' type="button" value={element} key={index} onClick={handleRoomEnter}></input>
-      })}
-    </div>
+          <p>{oneOfThreeChoice}</p>
+        </div>
+        :
+        <div className='main'>
+          {rooms.map((element, index) => {
+            if (element === "") {
+              return null;
+            }
+            return <input className='room' type="button" value={element} key={index} onClick={handleRoomEnter}></input>
+          })}
+        </div>
       }
 
       <div className='chat'>

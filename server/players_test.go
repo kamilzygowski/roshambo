@@ -9,7 +9,7 @@ import (
 
 func TestCreateNewPlayer(t *testing.T) {
 	testPlayers := []player{}
-	newTestPlayer := player{id: 1, name: "TestName", remoteAddress: "ANY_ADRESS", inGame: false}
+	newTestPlayer := player{id: 1, name: "TestName", remoteAddress: "ANY_ADRESS", isReady: false}
 	createNewPlayer(newTestPlayer, &testPlayers, &websocket.Conn{})
 	if len(testPlayers) <= 0 {
 		t.Errorf("Player creation error")
@@ -18,9 +18,9 @@ func TestCreateNewPlayer(t *testing.T) {
 
 func TestRemoveFromSlice(t *testing.T) {
 	testSlice := []player{
-		{id: 1, name: "TestName", remoteAddress: "ANY_ADRESS", inGame: false},
-		{id: 2, name: "TestName", remoteAddress: "ANY_ADRESS", inGame: false},
-		{id: 3, name: "TestName", remoteAddress: "ANY_ADRESS", inGame: false}}
+		{id: 1, name: "TestName", remoteAddress: "ANY_ADRESS", isReady: false},
+		{id: 2, name: "TestName", remoteAddress: "ANY_ADRESS", isReady: false},
+		{id: 3, name: "TestName", remoteAddress: "ANY_ADRESS", isReady: false}}
 	testSlice = removeFromSlice(testSlice, 1)
 	fmt.Println(testSlice)
 	if len(testSlice) != 2 || (testSlice[1].id != 3 && testSlice[0].id != 1) {
