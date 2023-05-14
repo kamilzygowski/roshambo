@@ -57,7 +57,7 @@ func socketReader(conn *websocket.Conn) {
 				for index := range allGames[i].players {
 					allGames[i].players[index].isReady = false
 					allGames[i].players[index].conn.WriteMessage(1, []byte("w"+winner))
-					allGames[i].players[index].conn.WriteMessage(1, []byte("s"+allGames[i].players[0].name+" "+strconv.Itoa(int(allGames[i].scores[0]))+" : "+strconv.Itoa(int(allGames[i].scores[1]))+" "+allGames[i].players[1].name))
+					allGames[i].players[index].conn.WriteMessage(1, []byte("s"+allGames[i].players[0].name+" ["+strconv.Itoa(int(allGames[i].scores[0]))+" : "+strconv.Itoa(int(allGames[i].scores[1]))+"] "+allGames[i].players[1].name))
 				}
 			}
 		}

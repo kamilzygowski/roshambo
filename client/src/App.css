@@ -45,6 +45,7 @@
 .winner{
   font-size: 36px;
   color: #6ab04c;
+  font-weight: 600;
 }
 
 .seconds{
@@ -55,8 +56,8 @@
 
 .scores{
   font-size: 36px;
-  color: #eb4d4b;
-  font-weight: 600;
+  color: #a29bfe;
+  font-weight: 700;
 }
 
 .ready:hover{
@@ -107,22 +108,24 @@
   cursor: pointer;
   border: none;
   border-radius: 2.5px;
+  background-color: #4834d4;
+  color: #fff
 }
 
 .room:hover{
   background-color: #000;
-  color: #fff;
-  transition: 0.45s;
+  color: #4834d4;
+  transition: 1.15s;
 }
 
 .paragraphName{
   color: #fff;
   font-size: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
 .acceptName{
-  margin-top: 25px;
+  margin-top: 65px;
   width: 65px;
   height: 30px;
   border: none;

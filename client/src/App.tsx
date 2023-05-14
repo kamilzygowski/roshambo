@@ -74,8 +74,8 @@ function App() {
     chatInputRef.current.value = ""
   }
 
-  const handleRoomEnter = (e: any) => {
-    socket.send("r" + e.target.value)
+  const handleRoomEnter = (name: string) => {
+    socket.send("r" + name)
   }
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -143,7 +143,7 @@ function App() {
             if (element === "") {
               return null;
             }
-            return <input className='room' type="button" value={element} key={index} onClick={handleRoomEnter}></input>
+            return <input className='room' type="button" value={element + "'s room"} key={index} onClick={() => handleRoomEnter(element)}></input>
           })}
         </div>
       }
