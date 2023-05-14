@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"strconv"
 
@@ -23,16 +22,6 @@ var incrementingId uint16 = 0
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
-}
-
-func getPlayerFromClient(conn net.Addr, _allPlayers *[]player) *player {
-	var resultPlayer *player
-	for _, p := range *_allPlayers {
-		if (conn).String() == p.remoteAddress {
-			resultPlayer = &p
-		}
-	}
-	return resultPlayer
 }
 
 func removeFromSlice(s []player, index int) []player {
@@ -55,12 +44,22 @@ func socketReader(conn *websocket.Conn) {
 	for {
 		for i := range allGames {
 			if allGames[i].players[0].isReady == true && allGames[i].players[1].isReady == true {
-				fmt.Println("PATRZYMY CO MAJĄ SHEET")
-				fmt.Println(allGames[i].players[0].choice)
-				fmt.Println(allGames[i].players[1].choice)
-				allGames = append(allGames[:i], allGames[i+1:]...)
+				var winner string
+				if (allGames[i].players[0].choice == 0 && allGames[i].players[1].choice == 1) || (allGames[i].players[0].choice == 1 && allGames[i].players[1].choice == 2) || (allGames[i].players[0].choice == 2 && allGames[i].players[1].choice == 0) {
+					winner = allGames[i].players[0].name + " WON"
+					allGames[i].scores[0] = allGames[i].scores[0] + 1
+				} else if (allGames[i].players[1].choice == 0 && allGames[i].players[0].choice == 1) || (allGames[i].players[1].choice == 1 && allGames[i].players[0].choice == 2) || (allGames[i].players[1].choice == 2 && allGames[i].players[0].choice == 0) {
+					winner = allGames[i].players[1].name + " WON"
+					allGames[i].scores[1] = allGames[i].scores[1] + 1
+				} else {
+					winner = "DRAW"
+				}
+				for index := range allGames[i].players {
+					allGames[i].players[index].isReady = false
+					allGames[i].players[index].conn.WriteMessage(1, []byte("w"+winner))
+					allGames[i].players[index].conn.WriteMessage(1, []byte("s"+allGames[i].players[0].name+" "+strconv.Itoa(int(allGames[i].scores[0]))+" : "+strconv.Itoa(int(allGames[i].scores[1]))+" "+allGames[i].players[1].name))
+				}
 			}
-			fmt.Println(allGames[i])
 		}
 
 		msgType, msg, err := (*conn).ReadMessage()
@@ -102,7 +101,6 @@ func socketReader(conn *websocket.Conn) {
 			} else if msg[0] == []byte("r")[0] {
 				// Room
 				msgContent := msg[1:]
-				fmt.Println(client.RemoteAddr())
 				for i := range allPlayers {
 					if (allPlayers[i]).name == string(msgContent) {
 						// IF PLAYER DIDNT CLICK ON HIS ROOM
@@ -114,7 +112,7 @@ func socketReader(conn *websocket.Conn) {
 										playerFromClient = &allPlayers[i]
 									}
 								}
-								allGames = append(allGames, Games{players: []player{*playerFromClient, allPlayers[i]}, isDone: false})
+								allGames = append(allGames, Games{players: []player{*playerFromClient, allPlayers[i]}, isDone: false, scores: []uint16{0, 0}})
 								(*allPlayers[i].conn).WriteMessage(1, []byte("g"))
 								(*conn).WriteMessage(1, []byte("g"))
 							}
@@ -122,17 +120,23 @@ func socketReader(conn *websocket.Conn) {
 					}
 				}
 			} else if msg[0] == []byte("g")[0] {
-				msgContent := msg[1:]
 				// Player is ready
-				for i := range allPlayers {
+				for i := 0; i < len(allPlayers); i++ {
+					msgContent := msg[1:]
 					if (allPlayers[i]).remoteAddress == (*conn).RemoteAddr().String() {
 						msgInt, err := strconv.Atoi(string(msgContent))
 						if err != nil {
 							fmt.Println("ERROR [Msg string to int conversion] ERROR")
 						}
-						fmt.Println("Krincz")
 						allPlayers[i].setReady(uint8(msgInt))
-						fmt.Println(allPlayers[i].choice)
+						for i := range allGames {
+							if allGames[i].players[0].remoteAddress == (*conn).RemoteAddr().String() {
+								allGames[i].players[0].setReady(uint8(msgInt))
+							}
+							if allGames[i].players[1].remoteAddress == (*conn).RemoteAddr().String() {
+								allGames[i].players[1].setReady(uint8(msgInt))
+							}
+						}
 					}
 				}
 			}

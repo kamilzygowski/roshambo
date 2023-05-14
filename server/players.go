@@ -18,6 +18,7 @@ type player struct {
 type Games struct {
 	isDone  bool
 	players []player
+	scores  []uint16
 }
 
 const (
@@ -37,6 +38,6 @@ func (p *player) generateName() string {
 }
 
 func (p *player) setReady(choice uint8) {
-	p.isReady = true
-	p.choice = choice
+	(*p).isReady = true
+	(*p).choice = choice
 }

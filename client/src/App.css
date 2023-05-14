@@ -9,26 +9,54 @@
   height: 100%;
   width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
 }
 
-.game{
-  flex-direction: column;
+.loadingDiv{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 45px;
+}
+
+.loading{
+  color: #f9ca24;
+  font-size: 500;
+  font-size: 19px;
+  height: auto;
+  margin-right: 25px;
 }
 
 .ready{
   width: 120px;
   height: 40px;
-  margin-bottom: 85px;
+  margin-top: 85px;
   font-size: 20px;
   border: none;
   font-weight: 700;
   color: #fff;
   border-radius: 5px;
   background-color: #6ab04c;
+}
+
+.winner{
+  font-size: 36px;
+  color: #6ab04c;
+}
+
+.seconds{
+  font-size: 32px;
+  font-weight: 700;
+  color: #f6e58d;
+}
+
+.scores{
+  font-size: 36px;
+  color: #eb4d4b;
+  font-weight: 600;
 }
 
 .ready:hover{
@@ -40,7 +68,7 @@
 
 .chosen{
   opacity: 1;
-  box-shadow: rgba(0, 255, 128, 0.45) 0px 54px 55px, rgba(0, 255, 106, 0.22) 0px -12px 30px, rgba(0, 255, 55, 0.22) 0px 4px 16px, rgba(255, 255, 255, 0.2) 0px 12px 13px, rgba(0, 255, 0, 0.19) 0px -3px 5px;
+  box-shadow: rgba(55, 249, 251, 0.4) 5px 5px, rgba(55, 249, 251, 0.3) 10px 10px, rgba(55, 249, 251, 0.2) 15px 15px, rgba(55, 249, 251, 0.1) 20px 20px, rgba(55, 249, 251, 0.05) 25px 25px;
 }
 
 .oneOfThree{
@@ -70,22 +98,50 @@
 }
 
 .room{
-  width: 125px;
-  height: 125px;
+  width: 275px;
+  height: 40px;
   margin-inline: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 2.5px;
+}
+
+.room:hover{
+  background-color: #000;
+  color: #fff;
+  transition: 0.45s;
+}
+
+.paragraphName{
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 30px;
 }
 
 .acceptName{
   margin-top: 25px;
   width: 65px;
   height: 30px;
+  border: none;
+  border-radius: 7px;
+  font-weight: 600;
+  background-color: green;
+  color: #fff;
+  cursor: pointer;
 }
 
 .inputName{
-  width: 250px;
+  width: 210px;
   height: 20px;
   border: none;
   outline: none;
+  height: 28px;
+  font-size: 18px;
+  padding-inline: 5px;
+  border-radius: 4px;
 }
 
 .setName{

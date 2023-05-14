@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { socket } from "./socket"
 import dateFormat from "dateformat"
+import { Oval } from 'react-loader-spinner';
 
 function App() {
   const [connected, setConnected] = useState<boolean>(false);
@@ -14,7 +15,13 @@ function App() {
   const [duringMatch, setDuringMatch] = useState<boolean>(false)
   const [oneOfThreeChoice, setOneOfThreeChoice] = useState<number>()
   const [gameStatus, setGameStatus] = useState<string>("")
+  const [winner, setWinner] = useState<string>("")
+  const [scores, setScores] = useState<string>(" ")
   const buttonsRef = useRef<any>()
+  const secondsRef = useRef<any>()
+  const [seconds, setSeconds] = useState(1)
+  const [timerActiv, setTimerActiv] = useState(false)
+  const [isLoaderActive, setLoaderActive] = useState(false)
   enum OneOfThree {
     Paper,
     Stone,
@@ -23,6 +30,23 @@ function App() {
   useEffect(() => {
     chatWrapperRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [chatMessages])
+
+  const threeSecondsTimer = (winnerStr: string) => {
+    //console.log(secondsRef.current.style)
+    // secondsRef.current.style.color = "#f6e58d"
+    setTimerActiv(true)
+    setTimeout(() => {
+      clearInterval(interval)
+      setWinner(winnerStr)
+      setTimerActiv(false)
+      setSeconds(1)
+    }, 2750)
+    const interval = setInterval(() => {
+      // secondsRef.current.style.color = "#ffbe76"
+
+      setSeconds(oldVal => oldVal = oldVal + 1)
+    }, 1000)
+  }
 
   useEffect(() => {
     socket.onopen = () => {
@@ -37,10 +61,15 @@ function App() {
         const charsToSplit = "###"
         const dataAsString = e.data.toString().substring(charsToSplit.length + 1)
         const resultArr = dataAsString.split(charsToSplit)
-        console.log(dataAsString)
         setRooms(resultArr)
       } else if (e.data[0] === "g") {
         setDuringMatch(true)
+      } else if (e.data[0] === "w") {
+        let dataAsString = e.data.toString().substring(1)
+        threeSecondsTimer(dataAsString);
+      } else if (e.data[0] === "s") {
+        let dataAsString = e.data.toString().substring(1)
+        setScores(dataAsString)
       }
     }
     socket.onclose = () => {
@@ -66,6 +95,9 @@ function App() {
     }
   }
   const sendNameToSock = () => {
+    if (draftingName === "" || draftingName === undefined) {
+      return
+    }
     setName(draftingName)
     socket.send("n" + draftingName)
   }
@@ -82,19 +114,40 @@ function App() {
 
   return (
     <div className="App" onKeyDown={keyDownHandler}>
-      {connected ? <p className='connectionStatus'>Connected</p> : <p className='connectionStatus'>Not connected</p>}
-      {name === undefined ? <div className='setName'><input className='inputName' onChange={(elem) => setDraftingName(elem.target.value)} />
-        <button className='acceptName' onClick={(e) => sendNameToSock()}>Accept</button></div> : null}
+      {/*connected ? <p className='connectionStatus'>Connected</p> : <p className='connectionStatus'>Not connected</p>*/}
+      {name === undefined ? <div className='setName'>
+        <p className='paragraphName'>Provide your name</p>
+        <input className='inputName' onChange={(elem) => setDraftingName(elem.target.value)} />
+        <button className='acceptName' onClick={() => sendNameToSock()}>Accept</button></div> : null}
       {duringMatch ?
         <div className='game'>
-          <p>{gameStatus}</p>
-          <input className='ready' value={"READY"} type="button" onClick={() => { socket.send("g" + oneOfThreeChoice); setGameStatus("Waiting for opponent") }} />
+          {timerActiv ? null : <p className='scores'>{scores}</p>}
+          <div className='loadingDiv'>
+            {timerActiv ? null : winner !== "" ? <p className='winner'>{winner}</p> : <p className='loading'>{gameStatus}</p>}
+            {timerActiv ? <p className='seconds' ref={secondsRef}>{seconds}</p> : winner === "" ?
+            isLoaderActive ?
+                <Oval
+                height={40}
+                width={40}
+                color="#f9ca24"
+                visible={true}
+                ariaLabel='oval-loading'
+                secondaryColor="#f6e58d"
+                strokeWidth={8}
+                strokeWidthSecondary={8} /> : null
+            : null }
+          </div>
           <div ref={buttonsRef}>
             <input type="button" className='oneOfThree' value={OneOfThree.Paper} onClick={oneOfThreeHandler} />
             <input type="button" className='oneOfThree' value={OneOfThree.Stone} onClick={oneOfThreeHandler} />
             <input type="button" className='oneOfThree' value={OneOfThree.Scissors} onClick={oneOfThreeHandler} />
           </div>
-          <p>{oneOfThreeChoice}</p>
+          <input className='ready' value={"READY"} type="button" onClick={() => {
+            socket.send("g" + oneOfThreeChoice)
+            setLoaderActive(true)
+            setGameStatus("Waiting for opponent")
+            setWinner("");
+          }} />
         </div>
         :
         <div className='main'>
@@ -106,7 +159,6 @@ function App() {
           })}
         </div>
       }
-
       <div className='chat'>
         {chatMessages.map((element, index) => {
           return <p key={index}>{element}</p>;
