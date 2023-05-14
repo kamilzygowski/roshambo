@@ -1,38 +1,208 @@
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+}
+
+.main, .game {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.loadingDiv{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 45px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.loading{
+  color: #f9ca24;
+  font-size: 500;
+  font-size: 19px;
+  height: auto;
+  margin-right: 25px;
+}
+
+.ready{
+  width: 120px;
+  height: 40px;
+  margin-top: 85px;
+  font-size: 20px;
+  border: none;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 5px;
+  background-color: #6ab04c;
+}
+
+.winner{
+  font-size: 36px;
+  color: #6ab04c;
+}
+
+.seconds{
+  font-size: 32px;
+  font-weight: 700;
+  color: #f6e58d;
+}
+
+.scores{
+  font-size: 36px;
+  color: #eb4d4b;
+  font-weight: 600;
+}
+
+.ready:hover{
+  transition: 0.2s;
+  background-color: #686de0;
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+.chosen{
+  opacity: 1;
+  box-shadow: rgba(55, 249, 251, 0.4) 5px 5px, rgba(55, 249, 251, 0.3) 10px 10px, rgba(55, 249, 251, 0.2) 15px 15px, rgba(55, 249, 251, 0.1) 20px 20px, rgba(55, 249, 251, 0.05) 25px 25px;
+}
+
+.oneOfThree{
+  width: 195px;
+  height: 195px;
+  margin-inline: 25px;
+  background-color: #f7d794;
+  border: none;
+  opacity: 0.6;
+  color: rgba(0,0,0,0);
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.oneOfThree:nth-of-type(1){
+  background-image: url("../public/paper.svg");
+}
+.oneOfThree:nth-of-type(2){
+  background-image: url("../public/rock.svg");
+}
+.oneOfThree:nth-of-type(3){
+  background-image: url("../public/scissors.svg");
+}
+
+.oneOfThree:hover{
+  opacity: 1;
+  transition: 0.05s;
+}
+
+.room{
+  width: 275px;
+  height: 40px;
+  margin-inline: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 2.5px;
+}
+
+.room:hover{
+  background-color: #000;
+  color: #fff;
+  transition: 0.45s;
+}
+
+.paragraphName{
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.acceptName{
+  margin-top: 25px;
+  width: 65px;
+  height: 30px;
+  border: none;
+  border-radius: 7px;
+  font-weight: 600;
+  background-color: green;
+  color: #fff;
+  cursor: pointer;
+}
+
+.inputName{
+  width: 210px;
+  height: 20px;
+  border: none;
+  outline: none;
+  height: 28px;
+  font-size: 18px;
+  padding-inline: 5px;
+  border-radius: 4px;
+}
+
+.setName{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: inherit;
+  background: rgba(0,0,0,0.99);
+}
+
+.startButton{
+  height: 40px;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  margin-inline: 35px;
+  margin-bottom: 10px;
+}
+
+.chatInput {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  padding-inline: 15px;
+}
+
+.chatInput:focus {
+  outline: none;
+}
+
+.chatButton {
+  height: 40px;
+  width: 120px;
+  border: none;
+  background-color: green;
+  color: #fff;
+  font-size: 18px;
+}
+
+.chat {
+  justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #ffeaa7;
+  text-align: start;
+  overflow-y: auto;
+  padding-inline: 15px;
+  margin-inline: 35px;
+  height: 270px;
+  word-wrap: break-word;
+}
+
+.connectionStatus {
+  color: greenyellow;
 }

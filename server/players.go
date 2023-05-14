@@ -2,15 +2,23 @@ package main
 
 import (
 	"strconv"
+
+	"github.com/gorilla/websocket"
 )
 
 type player struct {
 	id            uint16
-	x             int32
-	y             int32
 	name          string
-	vocation      uint8
 	remoteAddress string
+	isReady       bool
+	conn          *websocket.Conn
+	choice        uint8
+}
+
+type Games struct {
+	isDone  bool
+	players []player
+	scores  []uint16
 }
 
 const (
@@ -20,8 +28,8 @@ const (
 	West  = 3
 )
 
-func createNewPlayer(_player player, allPlayers *[]player) {
-	newPlayer := player{id: _player.id, x: _player.x, y: _player.y, name: _player.generateName(), vocation: _player.vocation, remoteAddress: _player.remoteAddress}
+func createNewPlayer(_player player, allPlayers *[]player, conn *websocket.Conn) {
+	newPlayer := player{id: _player.id, name: _player.generateName(), remoteAddress: _player.remoteAddress, conn: conn, isReady: false}
 	*allPlayers = append(*allPlayers, newPlayer)
 }
 
@@ -29,6 +37,7 @@ func (p *player) generateName() string {
 	return "Player" + strconv.Itoa(int((*p).id))
 }
 
-func (p *player) move(direction uint8) {
-	(*p).x++
+func (p *player) setReady(choice uint8) {
+	(*p).isReady = true
+	(*p).choice = choice
 }
