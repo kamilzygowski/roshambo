@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/roshambo/static/css/main.0788e99c.css",
-    "main.js": "/roshambo/static/js/main.6a22b7b3.js",
+    "main.css": "/roshambo/static/css/main.5c601cb1.css",
+    "main.js": "/roshambo/static/js/main.2f2eb28f.js",
     "static/js/787.c4e7f8f9.chunk.js": "/roshambo/static/js/787.c4e7f8f9.chunk.js",
     "static/media/rock.svg": "/roshambo/static/media/rock.fdf9221371ca6cb76e93.svg",
     "static/media/paper.svg": "/roshambo/static/media/paper.67b1f059657e7163491f.svg",
     "static/media/scissors.svg": "/roshambo/static/media/scissors.b197de9e653ff0c67731.svg",
     "index.html": "/roshambo/index.html",
-    "main.0788e99c.css.map": "/roshambo/static/css/main.0788e99c.css.map",
-    "main.6a22b7b3.js.map": "/roshambo/static/js/main.6a22b7b3.js.map",
+    "main.5c601cb1.css.map": "/roshambo/static/css/main.5c601cb1.css.map",
+    "main.2f2eb28f.js.map": "/roshambo/static/js/main.2f2eb28f.js.map",
     "787.c4e7f8f9.chunk.js.map": "/roshambo/static/js/787.c4e7f8f9.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0788e99c.css",
-    "static/js/main.6a22b7b3.js"
+    "static/css/main.5c601cb1.css",
+    "static/js/main.2f2eb28f.js"
   ]
 }
