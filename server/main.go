@@ -15,7 +15,7 @@ var upgrader = websocket.Upgrader{
 }
 
 var clients = []websocket.Conn{}
-var allPlayers = []player{}
+var allPlayers = []Player{}
 var allGames = []Games{}
 var allNames string
 var incrementingId uint16 = 0
@@ -24,7 +24,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server is online"))
 }
 
-func removeFromSlice(s []player, index int) []player {
+func removeFromSlice(s []Player, index int) []Player {
 	return append(s[:index], s[index+1:]...)
 }
 
@@ -106,13 +106,13 @@ func socketReader(conn *websocket.Conn) {
 						// IF PLAYER DIDNT CLICK ON HIS ROOM
 						if client.RemoteAddr().String() != allPlayers[i].remoteAddress {
 							if client.RemoteAddr().String() == (*conn).RemoteAddr().String() {
-								var playerFromClient *player
+								var playerFromClient *Player
 								for i := range allPlayers {
 									if allPlayers[i].remoteAddress == client.RemoteAddr().String() {
 										playerFromClient = &allPlayers[i]
 									}
 								}
-								allGames = append(allGames, Games{players: []player{*playerFromClient, allPlayers[i]}, isDone: false, scores: []uint16{0, 0}})
+								allGames = append(allGames, Games{players: []Player{*playerFromClient, allPlayers[i]}, isDone: false, scores: []uint16{0, 0}})
 								(*allPlayers[i].conn).WriteMessage(1, []byte("g"))
 								(*conn).WriteMessage(1, []byte("g"))
 							}
@@ -149,10 +149,9 @@ func webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, _ := upgrader.Upgrade(w, r, nil)
 
 	clients = append(clients, *conn)
-	//(*conn).WriteMessage(1, []byte("r"+allNames))
 	// Add and init player
 	incrementingId++
-	newPlayer := player{id: incrementingId, name: "Name", remoteAddress: (*conn).RemoteAddr().String(), isReady: false, conn: conn}
+	newPlayer := Player{id: incrementingId, name: "Name", remoteAddress: (*conn).RemoteAddr().String(), isReady: false, conn: conn}
 	createNewPlayer(newPlayer, &allPlayers, conn)
 	sendRoomsToAllClients()
 	socketReader(conn)
